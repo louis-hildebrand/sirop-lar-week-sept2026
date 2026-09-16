@@ -1,0 +1,15 @@
+{
+    "latex-workshop.latex.outDir": "%DIR%",
+    "latex-workshop.latex.tools": [
+        {
+            "name": "make",
+            "command": "make"
+        }
+    ],
+    "latex-workshop.latex.recipes": [
+        {
+            "name": "build",
+            "tools": ["make"]
+        }
+    ],
+}
