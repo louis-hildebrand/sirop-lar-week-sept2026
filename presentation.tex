@@ -221,6 +221,7 @@
             \end{center}
         \end{column}
         \onslide<4->
+        % TODO: emphasize that fusion can't be done in Quartus; also show fission
         \begin{column}{0.5\textwidth}
             \begin{center}
                 \textbf{Fusion} \\
@@ -390,6 +391,8 @@
 %     % \end{itemize}
 % \end{frame}
 
+% TODO: show diagram of dacore, or at least mention "dacore" somewhere
+% TODO: update numbers to use consistent compilation settings
 \begin{frame}{\emph{Previous} Results}
     % TODO: Fix vertical spacing
     \begin{center}
@@ -428,6 +431,8 @@
     % TODO: Also include FIR source code as a footnote?
 \end{frame}
 
+% TODO: add another line showing before MR vs after MR
+% TODO: conclude that Sirop helped find improvement
 \section*{Latest Results}
 
 \begin{frame}{Why the Difference in ALM Usage?}
@@ -479,7 +484,9 @@
 
 \section*{Other Features}
 
+% TODO: emphasize how Sirop helped improve the current LASP firmware
 \begin{frame}{Initial \texttt{valid} Outputs}
+    % TODO: show reset signal as well?
     \begin{columns}[b]
         \begin{column}{0.1\textwidth}
             \raggedleft
@@ -551,6 +558,9 @@
     \end{itemize}
 \end{frame}
 
+% TODO: point out that Etienne's been using a similar trick; it's not only for FIR filter
+% TODO: cite Raphael's talk in "Offline software + DQ"
+% TODO: refer to institutes, not individuals
 \begin{frame}{DSP Input Cascade}
     \begin{itemize}
         \item TODO: explain FIR filter trick about selecting every 7th rather than every 8th index in shift register
@@ -566,12 +576,16 @@
     \begin{columns}
         \begin{column}{0.75\textwidth}
             \begin{itemize}
+                % TODO: more forceful conclusion
+                    %       * looking into differences led to tangible improvements in resource usage (MR2) and reliability (MR1)
                 \item \ourlang compiler matches resource efficiency of handwritten FIR filter, from much more concise source code
                 \item Next steps: more advanced energy reconstruction algorithms
                 \begin{itemize}
-                    \item Neural networks
+                    \item Neural networks (with CPPM, Dresden)
                     \item Optimal filter with forward corrections
                 \end{itemize}
+                % TODO: longer-term next steps (future directions?)
+                % Faster exploration of different NN architectures (e.g., representation of weights, hyper networks)
             \end{itemize}
         \end{column}
         \begin{column}{0.25\textwidth}
