@@ -127,23 +127,23 @@
 \newcommand{\gold}{Goldenrod!50!red}
 \begin{frame}[fragile]{Recap: Project Goal}
     \begin{center}
-        Goal: simplify the implementation of resource-efficient data processing (e.g., energy reconstruction algorithms) on FPGA
+        Goal: write high-level energy reconstruction algorithms, compile to resource-efficient VHDL
 
         \vspace{\baselineskip}
 
         \begin{tikzpicture}[
             scale=0.5,
-            node distance=0.7em and 1.2em,
+            node distance=0.5em and 1.2em,
             arrow/.style={->, black, very thick},
             flowchartnode/.style={draw, black, very thick, align=center},
-            process/.style={flowchartnode, rectangle, fill=blue!10, minimum height=2em, minimum width=5.5em},
+            process/.style={flowchartnode, rectangle, fill=blue!10, minimum height=1.6em, minimum width=5.5em},
             hiprocess/.style={process, fill=Goldenrod!90!red},
             decision/.style={flowchartnode, diamond, aspect=1.8, fill=orange!10},
             endpoint/.style={flowchartnode, ellipse, fill=green!10},
             io/.style={flowchartnode, trapezium, trapezium left angle=70, trapezium right angle=110}
         ]
             \scriptsize
-            \node[process, align=center]                (write-sirop)       {Write higher-\\level algorithm};
+            \node[process, align=center]                (write-sirop)       {Write};
             \node[io, right=of write-sirop]             (sirop-files)       {.sirop};
             \node[process, below=of sirop-files]        (run-sirop-tests)   {Test};
             \onslide+<1>
@@ -187,6 +187,7 @@
         \scriptsize
         \newcommand{\regwidth}{1em}
         \newcommand{\regheight}{1.75em}
+        % TODO: also take a moment to show manual workflow, so the presentation flows better?
         \begin{column}{0.4\textwidth}
             \begin{center}
                 \textbf{Latency matching} \\ \vspace{0.5\baselineskip}
@@ -285,126 +286,9 @@
     \onslide<1->
 \end{frame}
 
-% TODO: include slide showing some transformations like fusion, fission, latency matching?
-% \begin{frame}[fragile]{Other Automatic Transformations}
-%     \begin{columns}[t]
-%         \begin{column}{0.35\textwidth}
-%             \centering
-%             \newcommand{\h}{1em}
-%             \newcommand{\hh}{1.25em}
-%             \newcommand{\hhh}{10em}
-%             \newcommand{\y}{0em}
-%             \newcommand{\yy}{0.3em}
-%             \newcommand{\yyy}{5.2em}
-%             \newcommand{\rh}{1.8em}
-%             \begin{center}
-%                 \textbf{Fission}
-%             \end{center}
-%             % Before fission
-%             \begin{tikzpicture}
-%                 \node[adder] (mul13) {$\times$};
-%                 \node[adder, below left=\y and \h of mul13] (mul12) {$\times$};
-%                 \node[adder, above left=\y and \h of mul13] (mul11) {$\times$};
-%                 \node[reg, right=\h of mul13, minimum height=\rh] (reg1) {};
-%                 \node[above right=\clky and \clkx of reg1.south west, clk] () {};
-%                 \node[fu, fit=(mul11) (mul12) (mul13) (reg1), minimum height=\yyy, dotted, rounded corners] (before) {};
-%                 \coordinate[above left=\yy and \hh of mul11] (in11);
-%                 \coordinate[below left=\yy and \hh of mul11] (in12);
-%                 \coordinate[above left=\yy and \hh of mul12] (in13);
-%                 \coordinate[below left=\yy and \hh of mul12] (in14);
-%                 \coordinate[right=\hh of reg1] (out1);
-% 
-%                 \draw[arrow, out=0, in=135] (in11) to (mul11.north west);
-%                 \draw[arrow, out=0, in=225] (in12) to (mul11.south west);
-%                 \draw[arrow, out=0, in=135] (in13) to (mul12.north west);
-%                 \draw[arrow, out=0, in=225] (in14) to (mul12.south west);
-%                 \draw[arrow, out=0, in=135] (mul11) to (mul13);
-%                 \draw[arrow, out=0, in=225] (mul12) to (mul13);
-%                 \draw[arrow] (mul13) to (reg1);
-%                 \draw[arrow] (reg1) to (out1);
-%             \end{tikzpicture}
-% 
-%             \vspace{5mm}
-%             \onslide<2->
-% 
-%             % After fission
-%             \renewcommand{\y}{0em}
-%             \begin{tikzpicture}
-%                 \node[adder] (mul23) {$\times$};
-%                 \node[reg, above left=-0.4em and 1.75em of mul23, minimum height=\rh] (reg21) {};
-%                 \node[above right=\clky and \clkx of reg21.south west, clk] () {};
-%                 \node[adder, left=\h of reg21] (mul21) {$\times$};
-%                 \node[reg, below left=-0.4em and 1.75em of mul23, minimum height=\rh] (reg22) {};
-%                 \node[above right=\clky and \clkx of reg22.south west, clk] () {};
-%                 \node[adder, left=\h of reg22] (mul22) {$\times$};
-%                 \node[reg, right=\h of mul23, minimum height=\rh] (reg23) {};
-%                 \node[above right=\clky and \clkx of reg23.south west, clk] () {};
-%                 \node[fu, fit=(mul21) (mul22) (reg21) (reg22), minimum height=\yyy, dotted, rounded corners] (after1) {};
-%                 \node[fu, fit=(mul23) (reg23), minimum height=\yyy, dotted, rounded corners] (after2) {};
-%                 \coordinate[above left=\yy and \hh of mul21] (in21);
-%                 \coordinate[below left=\yy and \hh of mul21] (in22);
-%                 \coordinate[above left=\yy and \hh of mul22] (in23);
-%                 \coordinate[below left=\yy and \hh of mul22] (in24);
-%                 \coordinate[right=\hh of reg23] (out2);
-% 
-%                 \draw[arrow, out=0, in=135] (in21) to (mul21.north west);
-%                 \draw[arrow, out=0, in=225] (in22) to (mul21.south west);
-%                 \draw[arrow, out=0, in=135] (in23) to (mul22.north west);
-%                 \draw[arrow, out=0, in=225] (in24) to (mul22.south west);
-%                 \draw[arrow] (mul21) to (reg21);
-%                 \draw[arrow] (mul22) to (reg22);
-%                 \draw[arrow, out=0, in=135] (reg21) to (mul23);
-%                 \draw[arrow, out=0, in=225] (reg22) to (mul23);
-%                 \draw[arrow] (mul23) to (reg23);
-%                 \draw[arrow] (reg23) to (out2);
-%             \end{tikzpicture}
-%         \end{column}
-%         \begin{column}{0.65\textwidth}
-%             \onslide<3->
-%             \centering
-%             \newcommand{\regwidth}{1em}
-%             \newcommand{\regheight}{1.75em}
-%             \begin{center}
-%                 \textbf{Latency matching}
-%             \end{center}
-%             \begin{tikzpicture}[node distance=1em and 2em]
-%                 \node (start) {\color{white} \texttt{StmZip}};
-%                 \node[above right=of start] (above) {...(3 cycles)...};
-%                 \draw[arrow, out=0, in=180, looseness=1.5] (start) to (above);
-%                 \node[below right=of above] (zip) {\texttt{StmZip}};
-%                 \draw[arrow, out=0, in=180, looseness=1.5] (above) to (zip);
-%                 \node[below right=of start] (below) {{\color{white} ...(3 cycles)...}};
-%                 \onslide+<4>
-%                 \node[reg, right=0em of below.west, minimum width=\regwidth, minimum height=\regheight] (reg-1) {};
-%                 \node[above right=\clky and \clkx of reg-1.south west, clk] () {};
-%                 \draw[arrow, out=0, in=180, looseness=1.5] (start) to (reg-1);
-%                 \node[reg, left=0em of below.east, minimum width=\regwidth, minimum height=\regheight] (reg-3) {};
-%                 \node[above right=\clky and \clkx of reg-3.south west, clk] () {};
-%                 \draw[transparent] (reg-1)
-%                     to node[midway, reg, opaque, minimum width=\regwidth, minimum height=\regheight] (reg-2) {}
-%                     (reg-3);
-%                 \node[above right=\clky and \clkx of reg-2.south west, clk] () {};
-%                 \draw[arrow] (reg-1) to (reg-2);
-%                 \draw[arrow] (reg-2) to (reg-3);
-%                 \draw[arrow, out=0, in=180, looseness=1.5] (reg-3) to (zip);
-%                 \onslide+<3>
-%                 \draw[black, very thick, out=0, in=180, looseness=1.5] (start) to (below.west);
-%                 \draw[black, very thick] (below.west) to (below.east);
-%                 \draw[arrow, out=0, in=180, looseness=1.5] (below.east) to (zip);
-%                 \onslide<1->
-%             \end{tikzpicture}
-%         \end{column}
-%     \end{columns}
-%     % \begin{itemize}
-%     %     \item Fusion
-%     %     \item Fission
-%     %     \item Latency matching
-%     % \end{itemize}
-% \end{frame}
-
 % TODO: show diagram of dacore, or at least mention "dacore" somewhere
 % TODO: update numbers to use consistent compilation settings
-\begin{frame}{\emph{Previous} Results}
+\begin{frame}{\emph{Previous} Results, \texttt{dacore} FIR Filter}
     % TODO: Fix vertical spacing
     \begin{center}
         6-tap filter with hard-coded weights, targeting Agilex 7
@@ -415,7 +299,7 @@
             \toprule
             \textbf{Design}         & $\textbf{f}_{\textbf{max}}$   & \textbf{ALMs}         &           & \textbf{DSPs} \\
             \midrule
-            Handwritten VHDL        & \qty{880}{\mega\hertz}        & 115\footnotemark[1]   &           & 3 \\
+            Handwritten VHDL        & \qty{880}{\mega\hertz}        & 123\footnotemark[1]   &           & 3 \\
             Generated w/ \ourlang   & \qty{510}{\mega\hertz}        & 98\footnotemark[1]    & \hspace{-1em}(-15\%)   & 3 \\
             \bottomrule
         \end{tabular}
@@ -439,7 +323,6 @@
     \onslide<1->
     % TODO: Also include LASP-dacore commit as a footnote?
     % TODO: Also include Sirop commit as a footnote?
-    % TODO: Also include FIR source code as a footnote?
 \end{frame}
 
 % TODO: add another line showing before MR vs after MR
@@ -460,14 +343,10 @@
     \end{enumerate}
 \end{frame}
 
-% TODO: remove "ANTICIPATED" label once I confirm the results
-\begin{frame}{\emph{Updated} Results (!!! ANTICIPATED !!!)}
-    \onslide<0>
+\begin{frame}{\emph{Updated} Results, \texttt{dacore} FIR Filter}
     % TODO: Fix vertical spacing
-    % TODO: Show the results slide again, but with the new numbers
     % TODO: Be careful to use exactly the same .qsf file for this comparison!
     % TODO: Maybe just drop my generated VHDL into the LASP project
-    % TODO: Fix vertical spacing
     \begin{center}
         6-tap filter with hard-coded weights, targeting Agilex 7
 
@@ -475,10 +354,11 @@
 
         \begin{tabular}{lrrlr}
             \toprule
-            \textbf{Design}                     & $\textbf{f}_{\textbf{max}}$   & \textbf{ALMs}         & \textbf{DSPs} \\
+            \textbf{Design}                             & $\textbf{f}_{\textbf{max}}$   & \textbf{ALMs} & \textbf{DSPs} \\
             \midrule
-            Handwritten VHDL\footnotemark[1]    & \qty{810}{\mega\hertz}        & 118\footnotemark[2]   & 3 \\
-            Generated w/ \ourlang               & \qty{810}{\mega\hertz}        & 118\footnotemark[2]   & 3 \\
+            Handwritten VHDL, before \dspmergerequest   & \qty{880}{\mega\hertz}        & 123           & 3 \\
+            Generated w/ \ourlang                       & \qty{823}{\mega\hertz}        & 118           & 3 \\
+            Handwritten VHDL, after \dspmergerequest    & \qty{823}{\mega\hertz}        & 117           & 3 \\
             \bottomrule
         \end{tabular}
     \end{center}
@@ -487,9 +367,7 @@
     %\begin{center}
     %    \ourlang-generated FIR filter behaves as expected on Agilex 7 devkit with $f_{\textnormal{core}} = \qty{320}{\mega\hertz}$
     %\end{center}
-    \footnotetext[1]{After merge request \dspmergerequest}
     % TODO: Also include Sirop commit as a footnote?
-    % TODO: Also include FIR source code as a footnote?
     \onslide<1->
 \end{frame}
 
@@ -585,21 +463,21 @@
 
 \begin{frame}{Conclusion}
     \begin{columns}
-        \begin{column}{0.75\textwidth}
+        \begin{column}{0.8\textwidth}
             \begin{itemize}
                 % TODO: more forceful conclusion
                     %       * looking into differences led to tangible improvements in resource usage (MR2) and reliability (MR1)
-                \item \ourlang compiler matches resource efficiency of handwritten FIR filter, from much more concise source code
+                \item Investigating differences between generated and handwritten VHDL led to ideas for improving resource-efficiency (\dspmergerequest) and robustness (\validmergerequest)
+                \item Even after merge requests, \ourlang just about matches handwritten FIR filter, with much more concise source code
                 \item Next steps: more advanced energy reconstruction algorithms
                 \begin{itemize}
-                    \item Neural networks (with CPPM, Dresden)
-                    \item Optimal filter with forward corrections
+                    \item Neural networks (CPPM, Dresden)
+                    \item Optimal filter with forward corrections (McGill)
                 \end{itemize}
-                % TODO: longer-term next steps (future directions?)
-                % Faster exploration of different NN architectures (e.g., representation of weights, hyper networks)
+                \item Future direction: faster exploration of neural net architectures (e.g., representation of weights, hypernetworks)
             \end{itemize}
         \end{column}
-        \begin{column}{0.25\textwidth}
+        \begin{column}{0.2\textwidth}
             \begin{center}
                 \includegraphics[width=\linewidth]{github_qr_code.pdf}
                 \footnotesize
@@ -607,7 +485,6 @@
             \end{center}
         \end{column}
     \end{columns}
-    % TODO: QR code for Sirop repo?
 \end{frame}
 
 % TODO: include Sirop source code for FIR filter, for completeness?
