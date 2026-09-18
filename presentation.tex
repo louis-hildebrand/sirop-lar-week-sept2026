@@ -124,6 +124,7 @@
 
 \section*{Recap}
 
+\newcommand{\gold}{Goldenrod!50!red}
 \begin{frame}[fragile]{Recap: Project Goal}
     \begin{center}
         Goal: simplify the implementation of resource-efficient data processing (e.g., energy reconstruction algorithms) on FPGA
@@ -132,13 +133,13 @@
 
         \begin{tikzpicture}[
             scale=0.5,
-            node distance=0.9em and 1.2em,
+            node distance=0.7em and 1.2em,
             arrow/.style={->, black, very thick},
             flowchartnode/.style={draw, black, very thick, align=center},
-            process/.style={flowchartnode, rectangle, fill=blue!25, minimum height=2em, minimum width=5.5em},
-            hiprocess/.style={process, fill=yellow!50},
-            decision/.style={flowchartnode, diamond, aspect=1.8, fill=orange!25},
-            endpoint/.style={flowchartnode, ellipse, fill=green!25},
+            process/.style={flowchartnode, rectangle, fill=blue!10, minimum height=2em, minimum width=5.5em},
+            hiprocess/.style={process, fill=Goldenrod!90!red},
+            decision/.style={flowchartnode, diamond, aspect=1.8, fill=orange!10},
+            endpoint/.style={flowchartnode, ellipse, fill=green!10},
             io/.style={flowchartnode, trapezium, trapezium left angle=70, trapezium right angle=110}
         ]
             \scriptsize
@@ -179,6 +180,8 @@
         \end{tikzpicture}
     \end{center}
 
+    \vspace{-1.5\baselineskip}
+
     \onslide<2->
     \begin{columns}[t]
         \scriptsize
@@ -186,51 +189,52 @@
         \newcommand{\regheight}{1.75em}
         \begin{column}{0.4\textwidth}
             \begin{center}
-                \textbf{Latency matching} \\
+                \textbf{Latency matching} \\ \vspace{0.5\baselineskip}
                 \begin{tikzpicture}[node distance=0em and 1.25em]
                     % Before latency matching
-                    \onslide<2>
                     \coordinate (start);
-                    \node[above right=of start] (above) {(2 cycles)};
-                    \draw[arrow, out=0, in=180, looseness=1.5] (start) to (above);
-                    \coordinate[below right=of above] (zip);
-                    \draw[arrow, out=0, in=180, looseness=1.5] (above) to (zip);
-                    \node[below right=of start] (below) {{\color{white} (3 cycles)}};
-                    \draw[black, very thick, out=0, in=180, looseness=1.5] (start) to (below.west);
-                    \draw[black, very thick] (below.west) to (below.east);
-                    \draw[arrow, out=0, in=180, looseness=1.5] (below.east) to (zip);
-
-                    % TODO: separate the two sides somehow, or else make the "before" side a bit darker
+                    \node[above right=of start] (before-above) {(2 cycles)};
+                    \draw[arrow, out=0, in=180, looseness=1.5] (start) to (before-above);
+                    \coordinate[below right=of before-above] (zip);
+                    \draw[arrow, out=0, in=180, looseness=1.5] (before-above) to (zip);
+                    \node[below right=of start] (before-below) {{\color{white} (3 cycles)}};
+                    \draw[black, very thick, out=0, in=180, looseness=1.5] (start) to (before-below.west);
+                    \draw[black, very thick] (before-below.west) to (before-below.east);
+                    \draw[arrow, out=0, in=180, looseness=1.5] (before-below.east) to (zip);
 
                     % After latency matching
-                    \onslide<3->
                     \coordinate[right=0.5em of zip] (start);
-                    \node[above right=of start] (above) {(2 cycles)};
-                    \draw[arrow, out=0, in=180, looseness=1.5] (start) to (above);
-                    \coordinate[below right=of above] (zip);
-                    \draw[arrow, out=0, in=180, looseness=1.5] (above) to (zip);
-                    \node[below right=of start] (below) {{\color{white} (3 cycles)}};
-                    \node[reg, right=0.6em of below.west, minimum width=\regwidth, minimum height=\regheight] (reg-1) {};
+                    \node[above right=of start] (after-above) {(2 cycles)};
+                    \draw[arrow, out=0, in=180, looseness=1.5] (start) to (after-above);
+                    \coordinate[below right=of after-above] (zip);
+                    \draw[arrow, out=0, in=180, looseness=1.5] (after-above) to (zip);
+                    \node[below right=of start] (after-below) {{\color{white} (3 cycles)}};
+                    \node[reg, right=0.6em of after-below.west, minimum width=\regwidth, minimum height=\regheight] (reg-1) {};
                     \node[above right=\clky and \clkx of reg-1.south west, clk] () {};
                     \draw[arrow, out=0, in=180, looseness=1.5] (start) to (reg-1);
-                    \node[reg, left=0.6em of below.east, minimum width=\regwidth, minimum height=\regheight] (reg-2) {};
+                    \node[reg, left=0.6em of after-below.east, minimum width=\regwidth, minimum height=\regheight] (reg-2) {};
                     \node[above right=\clky and \clkx of reg-2.south west, clk] () {};
                     \draw[arrow] (reg-1) to (reg-2);
                     \draw[arrow, out=0, in=180, looseness=1.5] (reg-2) to (zip);
+
+                    \draw[arrow, \gold] ([yshift=7pt] before-above.east) to[bend left=30] coordinate[midway] (vrule-top) ([yshift=7pt] after-above.west);
+                    \draw[transparent] ([yshift=-7pt] after-below.west) to[bend left=30] coordinate[midway] (vrule-bot) ([yshift=-7pt] before-below.east);
+                    \draw[-, \gold, thick, densely dotted] ([xshift=0pt, yshift=-5pt] vrule-bot) to ([xshift=0pt, yshift=5pt] vrule-top);
                 \end{tikzpicture}
             \end{center}
         \end{column}
-        \onslide<4->
-        % TODO: emphasize that fusion can't be done in Quartus; also show fission
+        \onslide<3->
+        % TODO: emphasize that fusion can't be done in Quartus
         \begin{column}{0.5\textwidth}
             \begin{center}
-                \textbf{Fusion} \\
+                \onslide<3->
+                \hspace{3em}\textbf{Fusion} \\ \vspace{0.5\baselineskip}
                 \begin{tikzpicture}[
                     node distance=0.25em and 0.5em,
                     mycloud/.style={cloud, draw, black, very thick, inner sep=2pt}
                 ]
                     % Before fusion
-                    \onslide<4>
+                    \onslide<3->
                     \coordinate (start);
                     \node[mycloud, right=1em of start] (f) {$f$};
                     \node[reg, right=of f, minimum width=\regwidth, minimum height=\regheight] (reg-f) {};
@@ -247,10 +251,7 @@
                     \draw[arrow] (g) to (reg-g);
                     \draw[arrow] (reg-g) to (end);
 
-                    % TODO: separate the two sides somehow, or else make the "before" side a bit darker
-
                     % After fusion
-                    \onslide<5->
                     \coordinate[right=0.5em of end] (start);
                     \node[mycloud, aspect=2, inner sep=0, right=1em of start] (fg) {$g \circ f$};
                     \node[reg, right=of fg, minimum width=\regwidth, minimum height=\regheight] (reg-fg) {};
@@ -260,11 +261,21 @@
                     \draw[arrow] (start) to (fg);
                     \draw[arrow] (fg) to (reg-fg);
                     \draw[arrow] (reg-fg) to (end);
-                \end{tikzpicture}
+
+                    \onslide<3->
+                    \draw[->, \gold, very thick] (entity-g.north east) to[bend left=30] coordinate[midway] (vrule-top) (entity-fg.north west);
+                    \onslide<4>
+                    \draw[->, \gold, very thick] (entity-fg.south west) to[bend left=30] coordinate[midway] (vrule-bot) (entity-g.south east);
+                    \onslide<3->
+                    \draw[-, \gold, thick, densely dotted] ([xshift=0pt, yshift=-5pt] vrule-bot) to ([xshift=0pt, yshift=5pt] vrule-top);
+                \end{tikzpicture} \\
+                \onslide<4>
+                \hspace{3em}\textbf{Fission}
+                \onslide<3->
             \end{center}
         \end{column}
+        \onslide<4->
         \begin{column}{0.1\textwidth}
-            \onslide<5->
             \begin{center}
                 \textbf{etc.}
             \end{center}
