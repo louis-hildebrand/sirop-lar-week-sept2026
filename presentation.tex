@@ -8,6 +8,7 @@
 \definecolor{keywordorange}{RGB}{214, 109, 17}
 \definecolor{darkgreen}{RGB}{15, 150, 15}
 \definecolor{darkblue}{RGB}{0, 0, 180}
+\definecolor{deltablue}{RGB}{49, 130, 189}
 \newcommand{\registergrey}{gray!25}
 
 \usepackage{tikz}
@@ -75,7 +76,7 @@
 \usetheme{Berlin}
 \usecolortheme{beaver}
 \title{\ourlang{}: High-Level Synthesis with Parallel Patterns}
-\author{\underline{Louis Hildebrand} \and Brigitte Vachon \and Christophe Dubach}
+\author{\underline{Louis Hildebrand} \and Maheyer Shroff \and \\ Christophe Dubach \and Brigitte Vachon}
 % TODO: update color theme's red to match McGill's red?
 \institute{\includegraphics[scale=0.8]{mcgill_logo.pdf}}
 \date{September 22, 2026}
@@ -127,7 +128,7 @@
 \newcommand{\gold}{Goldenrod!50!red}
 \begin{frame}[fragile]{Recap: Project Goal}
     \begin{center}
-        Goal: write high-level energy reconstruction algorithms, compile to resource-efficient VHDL
+        Goal: use a high-level language to develop resource-efficient VHDL implementations of energy reconstruction algorithms
 
         \vspace{\baselineskip}
 
@@ -286,7 +287,6 @@
     \onslide<1->
 \end{frame}
 
-% TODO: show diagram of dacore, or at least mention "dacore" somewhere
 % TODO: update numbers to use consistent compilation settings
 \begin{frame}{\emph{Previous} Results, \texttt{dacore} FIR Filter}
     % TODO: Fix vertical spacing
@@ -297,18 +297,15 @@
 
         \begin{tabular}{lrrlr}
             \toprule
-            \textbf{Design}         & $\textbf{f}_{\textbf{max}}$   & \textbf{ALMs}         &           & \textbf{DSPs} \\
+            \textbf{Design}         & $\textbf{f}_{\textbf{max}}$   & \textbf{ALMs} & $\mathbf{\Delta{}ALMs}$           & \textbf{DSPs} \\
             \midrule
-            Handwritten VHDL        & \qty{880}{\mega\hertz}        & 123\footnotemark[1]   &           & 3 \\
-            Generated w/ \ourlang   & \qty{510}{\mega\hertz}        & 98\footnotemark[1]    & \hspace{-1em}(-15\%)   & 3 \\
+            Handwritten VHDL        & \qty{880}{\mega\hertz}        & 123           &                                   & 3 \\
+            Generated w/ \ourlang   & \qty{823}{\mega\hertz}        & 118           & \textcolor{deltablue}{(-4\%)}     & 3 \\
             \bottomrule
         \end{tabular}
     \end{center}
-    \footnotetext[1]{
-        % TODO: include these ALMs instead, so people don't get the impression the latest results are worse?
-        Excluding ALMs reported as ``unavailable due to virtual I/Os.''
-        % Counting these, the results are 116 with VHDL and 118 with \ourlang{}.
-    }
+    % TODO: add footnote explaining difference with previous LAr week slides
+    % I didn't notice the device part number for McGill's devkit differs from the \texttt{G\_BSP\_AGI\_NO\_HW} target used in \texttt{LASP-dacore} :(
     \vspace{\baselineskip}
     % TODO: bring this up again?
     %\onslide<2->
@@ -325,24 +322,17 @@
     % TODO: Also include Sirop commit as a footnote?
 \end{frame}
 
-% TODO: add another line showing before MR vs after MR
-% TODO: conclude that Sirop helped find improvement
 \section*{Latest Results}
 
 \begin{frame}{Why the Difference in ALM Usage?}
-    \begin{enumerate}
-        \item Inconsistent compilation settings
-        \begin{itemize}
-            \item I didn't notice the device part number for McGill's devkit differs from the \texttt{G\_BSP\_AGI\_NO\_HW} target used in \texttt{LASP-dacore} :(
-        \end{itemize}
-        \item Different DSP pipelining settings
-        \begin{itemize}
-            \item See merge request \dspmergerequest in \texttt{LASP-dacore}
-            \item See presentation explaining DSP register packing: \dsppackingpresentation
-        \end{itemize}
-    \end{enumerate}
+    Different DSP pipelining settings
+    \begin{itemize}
+        \item See presentation explaining DSP register packing: \dsppackingpresentation
+        \item Ported to \texttt{LASP-dacore} in merge request \dspmergerequest
+    \end{itemize}
 \end{frame}
 
+% TODO: conclude that Sirop helped find improvement (e.g., by speeding up design-space exploration?)
 \begin{frame}{\emph{Updated} Results, \texttt{dacore} FIR Filter}
     % TODO: Fix vertical spacing
     % TODO: Be careful to use exactly the same .qsf file for this comparison!
@@ -352,13 +342,14 @@
 
         \vspace{\baselineskip}
 
+        \small
         \begin{tabular}{lrrlr}
             \toprule
-            \textbf{Design}                             & $\textbf{f}_{\textbf{max}}$   & \textbf{ALMs} & \textbf{DSPs} \\
+            \textbf{Design}                             & $\textbf{f}_{\textbf{max}}$   & \textbf{ALMs} & $\mathbf{\Delta{}ALMs}$       & \textbf{DSPs} \\
             \midrule
-            Handwritten VHDL, before \dspmergerequest   & \qty{880}{\mega\hertz}        & 123           & 3 \\
-            Generated w/ \ourlang                       & \qty{823}{\mega\hertz}        & 118           & 3 \\
-            Handwritten VHDL, after \dspmergerequest    & \qty{823}{\mega\hertz}        & 117           & 3 \\
+            Handwritten, before \dspmergerequest   & \qty{880}{\mega\hertz}        & 123           &                               & 3 \\
+            Generated w/ \ourlang                       & \qty{823}{\mega\hertz}        & 118           & \textcolor{deltablue}{(-4\%)} & 3 \\
+            Handwritten, after \dspmergerequest    & \qty{823}{\mega\hertz}        & 117           & \textcolor{deltablue}{(-5\%)} & 3 \\
             \bottomrule
         \end{tabular}
     \end{center}
@@ -450,12 +441,70 @@
 % TODO: point out that Etienne's been using a similar trick; it's not only for FIR filter
 % TODO: cite Raphael's talk in "Offline software + DQ"
 % TODO: refer to institutes, not individuals
-\begin{frame}{DSP Input Cascade}
-    \begin{itemize}
-        \item TODO: explain FIR filter trick about selecting every 7th rather than every 8th index in shift register
-    \end{itemize}
+\newlength{\shiftreglen}\setlength{\shiftreglen}{12em}
+\newlength{\dsplen}\setlength{\dsplen}{3.3em}
+\newlength{\deltay}\setlength{\deltay}{2em}
+\begin{frame}[t]{DSP Input Cascade}
+    % TODO: fix alignment of images
+    % TODO: show intermediate steps?
+    \begin{columns}[t]
+        \begin{column}{0.5\textwidth}
+            \begin{center}
+                \textbf{Intuitive FIR filter:}
+            \end{center}
+            \begin{tikzpicture}
+                \scriptsize
+                \node[rectangle, draw, black, very thick, minimum width=\shiftreglen] (shift) {$\longleftarrow$ Shift left};
+                \coordinate[above right=1em of shift.north east] (input);
+                \draw[arrow] (input) |- (shift.east);
+                \node[adder, below=2\deltay of shift.south, anchor=north] (adder) {$+$};
+                \coordinate[left=0.083333\shiftreglen of shift.south west] (current-tap);
+                \foreach \i in {0,8,16,24,32,40} {
+                    \coordinate[right=0.166666\shiftreglen of current-tap] (current-tap);
+                    \node[adder, below=\deltay of current-tap, anchor=center] (mul-\i) {$\times$};
+                    \draw[arrow] (current-tap) to node[at start, xshift=-2pt, yshift=2pt, anchor=north west] {\i} (mul-\i);
+                }
+                \draw[arrow] (mul-0.south)  to[bend right=30] (adder);
+                \draw[arrow] (mul-8.south)  to[bend right=20] (adder);
+                \draw[arrow] (mul-16.south) to[bend right=10] (adder);
+                \draw[arrow] (mul-24.south) to[bend left=10] (adder);
+                \draw[arrow] (mul-32.south) to[bend left=20] (adder);
+                \draw[arrow] (mul-40.south) to[bend left=30] (adder);
+                \coordinate[below=1em of adder] (output);
+                \draw[arrow] (adder) to (output);
+            \end{tikzpicture}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{center}
+                \textbf{Using DSPs:}
+            \end{center}
+            \begin{tikzpicture}[
+                dsp/.style={rectangle, draw, black, very thick, minimum width=\dsplen}
+            ]
+                \scriptsize
+                \node[rectangle, draw, black, very thick, minimum width=\shiftreglen] (shift) {$\longleftarrow$ Shift left};
+                \coordinate[above right=1em of shift.north east] (input);
+                \draw[arrow] (input) |- (shift.east);
+                \foreach \i/\dx in {0/0.0833\shiftreglen, 7/0.25\shiftreglen, 14/0.4167\shiftreglen, 21/0.5833\shiftreglen, 28/0.75\shiftreglen, 35/0.9167\shiftreglen} {
+                    \coordinate[right=\dx of shift.south west] (tap-\i);
+                    \coordinate[below=2\deltay of tap-\i] (dsp-in-\i);
+                    \draw[arrow] (tap-\i) to node[at start, xshift=-2pt, yshift=2pt, anchor=north west] {\i} (dsp-in-\i);
+                }
+                \draw[transparent] (dsp-in-0) to coordinate[midway] (dsp-0-north) (dsp-in-7);
+                \draw[transparent] (dsp-in-14) to coordinate[midway] (dsp-1-north) (dsp-in-21);
+                \draw[transparent] (dsp-in-28) to coordinate[midway] (dsp-2-north) (dsp-in-35);
+                \node[dsp, below=0pt of dsp-0-north] (dsp-0) {DSP};
+                \node[dsp, below=0pt of dsp-1-north] (dsp-1) {DSP};
+                \node[dsp, below=0pt of dsp-2-north] (dsp-2) {DSP};
+                \coordinate[below right=1em of dsp-2.south east] (output);
+                \draw[arrow] (dsp-0.east) to (dsp-1.west);
+                \draw[arrow] (dsp-1.east) to (dsp-2.west);
+                \draw[arrow] (dsp-2.east) -| (output);
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
     \begin{center}
-        \ourlang can automatically transform the simpler version into this resource-efficient version (by merging and shrinking redundant shift registers)!
+        \ourlang can automatically transform the simpler version into the resource-efficient version (by merging and shrinking redundant shift registers)!
     \end{center}
 \end{frame}
 
@@ -465,10 +514,8 @@
     \begin{columns}
         \begin{column}{0.8\textwidth}
             \begin{itemize}
-                % TODO: more forceful conclusion
-                    %       * looking into differences led to tangible improvements in resource usage (MR2) and reliability (MR1)
                 \item Investigating differences between generated and handwritten VHDL led to ideas for improving resource-efficiency (\dspmergerequest) and robustness (\validmergerequest)
-                \item Even after merge requests, \ourlang just about matches handwritten FIR filter, with much more concise source code
+                \item \ourlang generates a resource-efficient VHDL implementation (using the Agilex DSPs) from concise source code
                 \item Next steps: more advanced energy reconstruction algorithms
                 \begin{itemize}
                     \item Neural networks (CPPM, Dresden)
