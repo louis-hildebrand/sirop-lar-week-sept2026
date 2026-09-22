@@ -41,7 +41,7 @@
         sbuild, sdata, letstm, let, in, vbuild, true, false,
         const, accelerator, assert, yields,
         default, undefined, truncate18,
-        StmMap, StmReduce, StmZip, StmSum, StmSlideInit, VecAll, MulAddCascaded, StmCst
+        StmMap, StmReduce, StmZip, StmSum, StmSlide, VecAll, StmMapDot, StmCst
     },
     keywordstyle=[1]{\color{darkblue}\bfseries},
     morekeywords=[2]{init, next, stm, ready, if, then, else},
@@ -75,7 +75,7 @@
 
 \usetheme{Berlin}
 \usecolortheme{beaver}
-\title{\ourlang{}: High-Level Synthesis with Parallel Patterns}
+\title[Generating Energy Reconstruction Firmware with \ourlang]{Generating Resource-Efficient VHDL for Energy Reconstruction Using a High-Level Language}
 \author{\underline{Louis Hildebrand} \and Maheyer Shroff \and \\ Christophe Dubach \and Brigitte Vachon}
 % TODO(finalize): update color theme's red to match McGill's red?
 \institute{\includegraphics[scale=0.8]{mcgill_logo.pdf}}
@@ -281,8 +281,6 @@
     \onslide<1->
 \end{frame}
 
-% TODO: update numbers to use consistent compilation settings. Be careful to use the same .qsf file! Ideally, drop the generated entity into the LASP project
-% TODO: include the relevant commits for Sirop, LASP-dacore
 \begin{frame}{\emph{Previous} Results, \texttt{dacore} FIR Filter}
     % TODO: Fix vertical spacing
     \begin{center}
@@ -292,16 +290,20 @@
 
         \begin{tabular}{lrrlr}
             \toprule
-            \textbf{Design}         & $\textbf{f}_{\textbf{max}}$   & \textbf{ALMs} & $\mathbf{\Delta{}ALMs}$           & \textbf{DSPs} \\
+            \textbf{Design}                         & $\textbf{f}_{\textbf{max}}$   & \textbf{ALMs}         & $\mathbf{\Delta{}ALMs}$           & \textbf{DSPs} \\
             \midrule
-            Handwritten VHDL        & \qty{880}{\mega\hertz}        & 123           &                                   & 3 \\
-            Generated w/ \ourlang   & \qty{823}{\mega\hertz}        & 118           & \textcolor{deltablue}{(-4\%)}     & 3 \\
+            Handwritten VHDL\footnotemark[1]        & \qty{880}{\mega\hertz}        & 123\footnotemark[3]   &                                   & 3 \\
+            Generated w/ \ourlang\footnotemark[2]   & \qty{823}{\mega\hertz}        & 118\footnotemark[3]   & \textcolor{deltablue}{(-4\%)}     & 3 \\
             \bottomrule
         \end{tabular}
     \end{center}
-    % TODO: add footnote explaining difference with previous LAr week slides
-    % I didn't notice the device part number for McGill's devkit differs from the \texttt{G\_BSP\_AGI\_NO\_HW} target used in \texttt{LASP-dacore} :(
     \vspace{\baselineskip}
+    \footnotetext[1]{\texttt{LASP-dacore} \texttt{9258fad} (\texttt{dacore-v8.2})}
+    \footnotetext[2]{\ourlang v1.3.0}
+    \footnotetext[3]{
+        The numbers in the previous presentation (June 2026) are a bit different because I made some configuration mistakes (e.g., different part numbers for the target device).
+        In this presentation, all numbers are for the \texttt{G\_BSP\_AGI\_NO\_HW} target.
+    }
     % TODO: test FIR filter on the real board again?
     \onslide<1->
 \end{frame}
@@ -329,13 +331,16 @@
             \toprule
             \textbf{Design}                             & $\textbf{f}_{\textbf{max}}$   & \textbf{ALMs} & $\mathbf{\Delta{}ALMs}$       & \textbf{DSPs} \\
             \midrule
-            Handwritten, before \dspmergerequest   & \qty{880}{\mega\hertz}        & 123           &                               & 3 \\
-            Generated w/ \ourlang                       & \qty{823}{\mega\hertz}        & 118           & \textcolor{deltablue}{(-4\%)} & 3 \\
-            Handwritten, after \dspmergerequest    & \qty{823}{\mega\hertz}        & 117           & \textcolor{deltablue}{(-5\%)} & 3 \\
+            Handwritten, before \dspmergerequest\footnotemark[1]   & \qty{880}{\mega\hertz}        & 123           &                               & 3 \\
+            Generated w/ \ourlang\footnotemark[2]                       & \qty{823}{\mega\hertz}        & 118           & \textcolor{deltablue}{(-4\%)} & 3 \\
+            Handwritten, after \dspmergerequest\footnotemark[3]    & \qty{823}{\mega\hertz}        & 117           & \textcolor{deltablue}{(-5\%)} & 3 \\
             \bottomrule
         \end{tabular}
     \end{center}
     \onslide<1->
+    \footnotetext[1]{\texttt{LASP-dacore} \texttt{9258fad} (\texttt{dacore-v8.2})}
+    \footnotetext[2]{\ourlang v2.0.0}
+    \footnotetext[3]{\texttt{LASP-dacore} \texttt{5ef49f2}}
 \end{frame}
 
 \section*{Other Features}
@@ -416,7 +421,6 @@
     \end{itemize}
 \end{frame}
 
-% TODO: cite Raphael's talk in "Offline software + DQ" (for CPPM's neural net implementation?)
 % NOTE: refer to institutes, not individuals
 \newlength{\shiftreglen}\setlength{\shiftreglen}{12em}
 \newlength{\dsplen}\setlength{\dsplen}{3.3em}
@@ -491,12 +495,12 @@
 \section*{Conclusion}
 
 \begin{frame}{Conclusion}
-    \begin{columns}
-        \begin{column}{0.8\textwidth}
+    \begin{columns}[t]
+        \begin{column}{0.85\textwidth}
             \begin{itemize}
-                \item \ourlang generates a resource-efficient FIR filter (which uses the Agilex DSPs) from concise source code
-                \item Investigating differences between generated and handwritten VHDL led to ideas for improving robustness (\validmergerequest) and resource-efficiency (\dspmergerequest)
-                \item Next steps: more advanced energy reconstruction algorithms
+                \item \ourlang generates a resource-efficient FIR filter (using the Agilex DSPs) from concise source code
+                \item Investigating differences between generated and handwritten VHDL led to improvements in robustness (\validmergerequest) and resource-efficiency (\dspmergerequest)
+                \item Next steps: more advanced energy reconstruction algorithms\footnotemark[1]
                 \begin{itemize}
                     \item Neural networks (CPPM, Dresden)
                     \item Optimal filter with forward corrections (McGill)
@@ -504,7 +508,7 @@
                 \item Future direction: faster exploration of neural net architectures (e.g., representation of weights, hypernetworks)
             \end{itemize}
         \end{column}
-        \begin{column}{0.2\textwidth}
+        \begin{column}{0.15\textwidth}
             \begin{center}
                 \includegraphics[width=\linewidth]{github_qr_code.pdf}
                 \footnotesize
@@ -512,8 +516,53 @@
             \end{center}
         \end{column}
     \end{columns}
+    \footnotetext[1]{\url{https://indico.cern.ch/event/1724142/\#2-new-signal-reconstruction-me}}
 \end{frame}
 
-% TODO: include Sirop source code for FIR filter, for completeness?
+\appendix
+
+\begin{frame}[fragile]{FIR Filter in \ourlang (Part 1)}
+    \begin{lstlisting}[gobble=8]
+        // Number of channels for time multiplexing (usually 8 or 12)
+        const M: u32 = 8
+        // How many inputs to check, when testing
+        const T: u32 = 136
+        const DEPTH: u32 = 6
+        const COEFFS: Vec[i18, DEPTH] =
+            [-8_483:i18, 36_820:i18, -68_495:i18,
+             44_585:i18, 17_867:i18,  -9_379:i18]v
+        // Shift register size
+        const BUFSIZE: u32 = 1 + M * (DEPTH - 1)
+        // Number of pipeline registers to enable in the DSPs
+        const PIPELINE: u32 = 2
+
+        // See following slide for implementation...
+    \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{FIR Filter in \ourlang (Part 2)}
+    \begin{lstlisting}[gobble=8]
+        // See previous slide for const declarations...
+        accelerator[no_handshake, library=dacore,
+                    head(adc_i)=(undefined:i18, false)]
+        dacore_fir_slv = (adc_i: Stm[(i18, bool), T]) =>
+            let data =
+                adc_i
+                .StmMap( @(data, valid) => data )
+                .StmSlide(BUFSIZE)
+                // Select DEPTH elements, in steps of M
+                .StmMap( buf => buf[:DEPTH:M] )
+                .StmMapDot(StmCst(T-(BUFSIZE-1), COEFFS), PIPELINE)
+                .StmMap( x => truncate18(x >> 15) )
+            in
+            let valid =
+                adc_i
+                .StmMap( @(data, valid) => valid, /*head=*/false)
+                .StmSlide(BUFSIZE, /*head=*/false)
+                .StmMap( buf => buf[:DEPTH:M].VecAll(), /*head=*/false)
+            in
+            StmZip(data, valid, /*head=*/(undefined:i18, false))
+    \end{lstlisting}
+\end{frame}
 
 \end{document}
