@@ -77,7 +77,7 @@
 \usecolortheme{beaver}
 \title{\ourlang{}: High-Level Synthesis with Parallel Patterns}
 \author{\underline{Louis Hildebrand} \and Maheyer Shroff \and \\ Christophe Dubach \and Brigitte Vachon}
-% TODO: update color theme's red to match McGill's red?
+% TODO(finalize): update color theme's red to match McGill's red?
 \institute{\includegraphics[scale=0.8]{mcgill_logo.pdf}}
 \date{September 22, 2026}
 
@@ -264,19 +264,13 @@
                     \draw[arrow] (fg) to (reg-fg);
                     \draw[arrow] (reg-fg) to (end);
 
-                    \onslide<3->
                     \draw[->, \gold, very thick] (entity-g.north east) to[bend left=30] coordinate[midway] (vrule-top) (entity-fg.north west);
-                    \onslide<4>
                     \draw[->, \gold, very thick] (entity-fg.south west) to[bend left=30] coordinate[midway] (vrule-bot) (entity-g.south east);
-                    \onslide<3->
                     \draw[-, \gold, thick, densely dotted] ([xshift=0pt, yshift=-5pt] vrule-bot) to ([xshift=0pt, yshift=5pt] vrule-top);
                 \end{tikzpicture} \\
-                \onslide<4>
                 \hspace{3em}\textbf{Fission}
-                \onslide<3->
             \end{center}
         \end{column}
-        \onslide<4->
         \begin{column}{0.1\textwidth}
             \begin{center}
                 \textbf{etc.}
@@ -287,7 +281,8 @@
     \onslide<1->
 \end{frame}
 
-% TODO: update numbers to use consistent compilation settings
+% TODO: update numbers to use consistent compilation settings. Be careful to use the same .qsf file! Ideally, drop the generated entity into the LASP project
+% TODO: include the relevant commits for Sirop, LASP-dacore
 \begin{frame}{\emph{Previous} Results, \texttt{dacore} FIR Filter}
     % TODO: Fix vertical spacing
     \begin{center}
@@ -307,36 +302,23 @@
     % TODO: add footnote explaining difference with previous LAr week slides
     % I didn't notice the device part number for McGill's devkit differs from the \texttt{G\_BSP\_AGI\_NO\_HW} target used in \texttt{LASP-dacore} :(
     \vspace{\baselineskip}
-    % TODO: bring this up again?
-    %\onslide<2->
-    %\begin{center}
-    %    \ourlang-generated FIR filter mostly behaves as expected\footnotemark[2] on Agilex 7 devkit with $f_{\textnormal{core}} = \qty{320}{\mega\hertz}$
-    %\end{center}
-    %\footnotetext[2]{
-    %    % TODO: test my latest dacore implementation on the board (with slightly larger buffer than before)
-    %    In 2/16 channels, the very last signal tap sample shows the wrong output.
-    %    More investigation required.
-    %}
+    % TODO: test FIR filter on the real board again?
     \onslide<1->
-    % TODO: Also include LASP-dacore commit as a footnote?
-    % TODO: Also include Sirop commit as a footnote?
 \end{frame}
 
 \section*{Latest Results}
 
 \begin{frame}{Why the Difference in ALM Usage?}
-    Different DSP pipelining settings
+    Different DSP pipelining settings!
     \begin{itemize}
         \item See presentation explaining DSP register packing: \dsppackingpresentation
-        \item Ported to \texttt{LASP-dacore} in merge request \dspmergerequest
+        \item Updated \texttt{LASP-dacore} in merge request \dspmergerequest
     \end{itemize}
 \end{frame}
 
 % TODO: conclude that Sirop helped find improvement (e.g., by speeding up design-space exploration?)
 \begin{frame}{\emph{Updated} Results, \texttt{dacore} FIR Filter}
     % TODO: Fix vertical spacing
-    % TODO: Be careful to use exactly the same .qsf file for this comparison!
-    % TODO: Maybe just drop my generated VHDL into the LASP project
     \begin{center}
         6-tap filter with hard-coded weights, targeting Agilex 7
 
@@ -353,12 +335,6 @@
             \bottomrule
         \end{tabular}
     \end{center}
-    % TODO: mention this too?
-    %\vspace{\baselineskip}
-    %\begin{center}
-    %    \ourlang-generated FIR filter behaves as expected on Agilex 7 devkit with $f_{\textnormal{core}} = \qty{320}{\mega\hertz}$
-    %\end{center}
-    % TODO: Also include Sirop commit as a footnote?
     \onslide<1->
 \end{frame}
 
@@ -366,7 +342,6 @@
 
 % TODO: emphasize how Sirop helped improve the current LASP firmware
 \begin{frame}{Initial \texttt{valid} Outputs}
-    % TODO: show reset signal as well?
     \begin{columns}[b]
         \begin{column}{0.1\textwidth}
             \raggedleft
@@ -378,6 +353,7 @@
                 timing/name/.style={font=\sffamily\footnotesize},
                 timing/coldist=0.25,
             ]
+                \texttt{reset}    \\
                 \texttt{clock}    \\
                 \texttt{data\_i}  \\
                 \texttt{valid\_i} \\
@@ -399,6 +375,7 @@
                 timing/coldist=0,
                 timing/name/.style={font=\sffamily\footnotesize},
             ]
+                & 1h 2L    2L    2L      2L      2L    2L    2L \\
                 & c 12{2c} c \\
                 & 1u 2D{1} 2D{2} 2D{3}   2D{4}   2D{5} 2D{6} 1d{} \\
                 & 1l 2H    2H    2L      2H      2H    2H    1h \\
@@ -420,6 +397,7 @@
                 timing/coldist=0,
                 timing/name/.style={font=\sffamily\footnotesize},
             ]
+                & 1h 2L    2L    2L      2L      2L    2L    2L \\
                 & c 12{2c} c \\
                 & 1u 2D{1} 2D{2} 2D{3}   2D{4}   2D{5} 2D{6} 1d{} \\
                 & 1l 2H    2H    2L      2H      2H    2H    1h \\
@@ -438,14 +416,13 @@
     \end{itemize}
 \end{frame}
 
-% TODO: point out that Etienne's been using a similar trick; it's not only for FIR filter
-% TODO: cite Raphael's talk in "Offline software + DQ"
-% TODO: refer to institutes, not individuals
+% TODO: cite Raphael's talk in "Offline software + DQ" (for CPPM's neural net implementation?)
+% NOTE: refer to institutes, not individuals
 \newlength{\shiftreglen}\setlength{\shiftreglen}{12em}
 \newlength{\dsplen}\setlength{\dsplen}{3.3em}
 \newlength{\deltay}\setlength{\deltay}{2em}
 \begin{frame}[t]{DSP Input Cascade}
-    % TODO: fix alignment of images
+    % TODO(finalize): fix alignment of images
     % TODO: show intermediate steps?
     \begin{columns}[t]
         \begin{column}{0.5\textwidth}
@@ -503,8 +480,11 @@
             \end{tikzpicture}
         \end{column}
     \end{columns}
+    \begin{itemize}
+        \item This optimization also applies for neural networks (e.g., at CPPM)
+        \item \ourlang can automatically transform the simpler version into the resource-efficient version (by merging and shrinking redundant shift registers)!
+    \end{itemize}
     \begin{center}
-        \ourlang can automatically transform the simpler version into the resource-efficient version (by merging and shrinking redundant shift registers)!
     \end{center}
 \end{frame}
 
@@ -514,8 +494,8 @@
     \begin{columns}
         \begin{column}{0.8\textwidth}
             \begin{itemize}
-                \item Investigating differences between generated and handwritten VHDL led to ideas for improving resource-efficiency (\dspmergerequest) and robustness (\validmergerequest)
-                \item \ourlang generates a resource-efficient VHDL implementation (using the Agilex DSPs) from concise source code
+                \item \ourlang generates a resource-efficient FIR filter (which uses the Agilex DSPs) from concise source code
+                \item Investigating differences between generated and handwritten VHDL led to ideas for improving robustness (\validmergerequest) and resource-efficiency (\dspmergerequest)
                 \item Next steps: more advanced energy reconstruction algorithms
                 \begin{itemize}
                     \item Neural networks (CPPM, Dresden)
